@@ -21,10 +21,6 @@ class StellarTomlLint < Formula
     end
   end
 
-  def version
-    `git describe --tags --abbrev=0 2>/dev/null`.strip.chomp rescue "0.1.0"
-  end
-
   head "https://github.com/anchor-tools/stellar-toml-lint.git", branch: "main"
 
   def install
