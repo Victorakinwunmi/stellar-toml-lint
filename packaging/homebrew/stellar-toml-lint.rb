@@ -2,7 +2,7 @@ class StellarTomlLint < Formula
   desc "Offline SEP-1 linter for stellar.toml"
   homepage "https://github.com/anchor-tools/stellar-toml-lint"
   url "https://github.com/anchor-tools/stellar-toml-lint/releases/latest/download/stellar-toml-lint-macos-arm64.tar.gz"
-  sha256 "ignore"
+  sha256 :no_check
   license "Apache-2.0"
 
   on_macos do
