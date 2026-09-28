@@ -53,6 +53,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && npm run build:browser",
+    "build:binaries": "node scripts/build-binaries.mjs",
     "build:browser": "node scripts/build-browser.js",
     "dev": "tsc -p tsconfig.build.json --watch",
     "test": "vitest run",

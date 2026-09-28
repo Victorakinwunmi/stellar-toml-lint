@@ -9,6 +9,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Standalone binaries (issue #47):** release tags now publish self-contained
+  Linux (x64 glibc/musl and ARM64), macOS (Intel and Apple Silicon), and
+  Windows x64 executables with SHA-256 checksums. Homebrew installs the native
+  release binary without a Node.js runtime.
+
 - `--format summary` (`-f summary`), a one-line-per-file status format for `pre-push` hooks,
   monitoring scripts, and dashboards that need a verdict rather than a report:
   `stellar.toml: PASS (0 errors, 0 warnings)`. Each file gets exactly one line carrying the target,
