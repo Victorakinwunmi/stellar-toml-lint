@@ -1,0 +1,1 @@
+node "C:\Projects web\stellar-toml-lint\node_modules\vitest\dist\index.js" run test/protocols/sep30.test.ts
