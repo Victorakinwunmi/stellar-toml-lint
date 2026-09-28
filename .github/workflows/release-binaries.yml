@@ -53,6 +53,7 @@ jobs:
         with: { path: release, merge-multiple: true }
       - name: Generate checksums
         working-directory: release
-        run: sha256sum stellar-toml-lint-* > SHA256SUMS.txt
+        run: |
+          sha256sum stellar-toml-lint-*.tar.gz > SHA256SUMS.txt
       - uses: softprops/action-gh-release@v2
         with: { generate_release_notes: true, files: release/* }

@@ -2,22 +2,26 @@ class StellarTomlLint < Formula
   desc "Offline SEP-1 linter for stellar.toml"
   homepage "https://github.com/anchor-tools/stellar-toml-lint"
   url "https://github.com/anchor-tools/stellar-toml-lint/releases/latest/download/stellar-toml-lint-macos-arm64.tar.gz"
-  sha256 :no_check
+  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/anchor-tools/stellar-toml-lint/releases/latest/download/stellar-toml-lint-macos-arm64.tar.gz"
+      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
     else
       url "https://github.com/anchor-tools/stellar-toml-lint/releases/latest/download/stellar-toml-lint-macos-x64.tar.gz"
+      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
       url "https://github.com/anchor-tools/stellar-toml-lint/releases/latest/download/stellar-toml-lint-linux-arm64.tar.gz"
+      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
     else
       url "https://github.com/anchor-tools/stellar-toml-lint/releases/latest/download/stellar-toml-lint-linux-x64.tar.gz"
+      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
     end
   end
 
