@@ -13,17 +13,19 @@ describe('SEP-30 recovery signer multi-party identity and transaction signing va
     ],
   };
 
-  const validIdentityResponse = {
-    identity: {
-      signers: ['GBDSEO35ZC5EZIAXYQU5UQZ743JVFVZ3JAR256KVYV44JT2VYLHOQ3J5'],
-    },
-  };
-
-  const validInfoResponse = {
-    identity: {
-      signers: ['GBDSEO35ZC5EZIAXYQU5UQZ743JVFVZ3JAR256KVYV44JT2VYLHOQ3J5', 'GCMIMQCQDAQZB2D2J3H6X7A5C3D5E6F7G8H9I0JKL'],
-    },
-  };
+ const validIdentityResponse = {
+  identity: {
+    signers: ['GBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OX2H'],
+  },
+};
+const validInfoResponse = {
+  identity: {
+    signers: [
+      'GBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OX2H',
+      'GAHK7EEG2WWHVKDNT4CEQF7GKF2LGD5BRTC4TQ8XXK27RDUFLYVWDZDT',
+    ],
+  },
+};
 
   it('passes cleanly when recovery server returns valid signers', async () => {
     const fetchImpl = (async (url: string | URL | Request) => {
@@ -47,8 +49,8 @@ describe('SEP-30 recovery signer multi-party identity and transaction signing va
       return new Response(JSON.stringify({ error: 'Not found' }), { status: 404 });
     }) as unknown as typeof fetch;
 
-    const diagnostics = await verifySep30(doc, fetchImpl);
-    expect(diagnostics).toEqual([]);
+      const diagnostics = await verifySep30(doc, fetchImpl);
+      expect(diagnostics).toEqual([]);
   });
 
   it('asserts sep30/invalid-signer-response when signers contain invalid Ed25519 key', async () => {
@@ -57,7 +59,10 @@ describe('SEP-30 recovery signer multi-party identity and transaction signing va
       if (urlStr.endsWith('/accounts')) {
         return new Response(JSON.stringify({
           identity: {
-            signers: ['invalid-key', 'GBDSEO35ZC5EZIAXYQU5UQZ743JVFVZ3JAR256KVYV44JT2VYLHOQ3J5'],
+           signers: [
+          'GBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OX2H',
+          'INVALID_ED25519_KEY'
+          ],
           },
         }), { status: 200 });
       }
