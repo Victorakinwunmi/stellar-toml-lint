@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /** Build one self-contained CLI binary for a release target. */
+import process from 'node:process';
 import { existsSync } from 'node:fs';
 import { mkdir, rm } from 'node:fs/promises';
 import { basename, resolve } from 'node:path';
