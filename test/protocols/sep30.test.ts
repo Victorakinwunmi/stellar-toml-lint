@@ -91,7 +91,7 @@ const validInfoResponse = {
   });
 
   it('asserts sep30/server-unreachable when server is unreachable', async () => {
-    const fetchImpl = (async (url: string | URL | Request) => {
+    const fetchImpl = (async () => {
       return new Response(JSON.stringify({ error: 'Not found' }), { status: 500 });
     }) as unknown as typeof fetch;
 
@@ -100,7 +100,7 @@ const validInfoResponse = {
   });
 
   it('asserts sep30/server-unreachable when network error occurs', async () => {
-    const fetchImpl = (async (url: string | URL | Request) => {
+    const fetchImpl = (async () => {
       throw new Error('ECONNREFUSED Connection refused');
     }) as unknown as typeof fetch;
 
