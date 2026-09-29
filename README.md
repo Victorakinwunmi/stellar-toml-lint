@@ -178,6 +178,7 @@ Exit codes: **0** no errors, **1** problems found, **2** bad usage or I/O failur
 | `--audit-security`          | Audit cross-server token binding (SEP-10 JWT vs downstream endpoints) (requires `--check-network`)                      |
 | `--verify-sep6`             | Run end-to-end programmatic SEP-6 integration tester (requires `--check-network`)                                       |
 | `--verify-sep31`            | Audit SEP-31 cross-border payment lifecycle and schema (requires `--check-network`)                                     |
+| `--verify-sep30`            | Validate RECOVERY_SERVER /accounts endpoint and signer public keys (requires `--check-network`)                                     |
 | `--verify-sep8`             | Simulate SEP-8 regulated asset compliance approval server interaction (requires `--check-network`)                      |
 | `--verify-sep38`            | Audit SEP-38 quote coverage, bid-ask spread, and quote expirations (requires `--check-network`)                         |
 | `--check-contracts`         | Verify Soroban contract/WASM TTL and the SEP-45 auth interface online                                                   |
@@ -264,6 +265,7 @@ failure.
 | `--check-network`           | Verify accounts, fixed-supply issuer locks, CORS pre-flight responses, `HORIZON_URL`, SEP-8 flags, TLS certificate expiry, `ANCHOR_QUOTE_SERVER`, and SEP-6 `/info` online |
 | `--verify-sep10`            | Verify SEP-10 nonce uniqueness and replay resistance (requires `--check-network`)                                                                                          |
 | `--verify-sep8`             | Simulate SEP-8 regulated asset compliance approval server interaction (requires `--check-network`)                                                                         |
+| `--verify-sep30`            | Validate RECOVERY_SERVER /accounts endpoint and signer public keys (requires `--check-network`)                                     |
 | `--verify-sep38`            | Audit SEP-38 quote coverage, bid-ask spread, and quote expirations (requires `--check-network`)                                                                            |
 | `--crawl-peers`             | Discover validator peers with overlay `GET_PEERS` messages (requires `--check-network`)                                                                                    |
 | `--verify-overlay`          | Complete the overlay TCP handshake with each `[[VALIDATORS]]` HOST and check its network, node ID, and protocol version (requires `--check-network`)                       |
@@ -355,29 +357,6 @@ an unmatched glob, or I/O failure.
 Colour output follows the [NO_COLOR standard](https://no-color.org): setting `NO_COLOR` to any
 non-empty value disables it, an empty value counts as unset, and stdout not being a terminal
 disables it too. An explicit `--color` is the only thing that overrides `NO_COLOR`.
-
-### Anchor signing-key security (multi-sig governance)
-
-The `SIGNING_KEY` in `stellar.toml` is the root of cryptographic authority for SEP-10 web
-authentication, challenge transactions, and custodial assertions. An account controlled by a
-single master key (weight 1, threshold 1) is a single point of failure: one exfiltrated or
-unrecoverably lost key compromises every challenge the anchor signs.
-
-Security best practice is multi-signature governance: master key weight 0, several independent
-signing keys, and a medium/high threshold no single key can meet alone. Under `--check-network`,
-the linter queries Horizon (`/accounts/{SIGNING_KEY}`) and reports:
-
-| Rule                                    | Severity | Fires when                                                       |
-| --------------------------------------- | -------- | ---------------------------------------------------------------- |
-| `security/signing-key-single-signature` | warning  | Master key weight > 0 and there are no additional signers        |
-| `security/signing-key-unusable`         | error    | Total signer weight cannot meet `med_threshold` (locked account) |
-
-Both rules degrade to silence when Horizon is unreachable or times out, and honour
-`--off`/`--warn`/`--error` as usual.
-
-```bash
-stellar-toml-lint stellar.toml --check-network
-```
 
 ### Rule presets
 
@@ -504,6 +483,16 @@ qualified name (`[[CURRENCIES]].display_decimals`), its type (`integer (0-7)`), 
 own description, the permitted values where SEP-1 enumerates them (`live`, `dead`, `test`,
 `private`), and a link to the section of SEP-1 that defines the field. Hovering whitespace, a
 comment, or a key SEP-1 does not define shows nothing at all.
+
+#### VS Code extension
+
+The official client lives in [`editors/vscode/`](./editors/vscode/) and is built on
+`vscode-languageclient/node`. It activates for any file named `stellar.toml` or any
+file inside `.well-known/`, launches `stellar-toml-lint --lsp` over stdio, and
+contributes the `stellar-toml.lint`, `stellar-toml.format`, and
+`stellar-toml.readiness` commands plus the `stellarToml.strict`,
+`stellarToml.domain`, and `stellarToml.rules` settings and a `$(check)`/`$(error)`
+status bar item. Package it with `npm run package:vscode` (wraps `vsce package`).
 
 ### Alerting a Slack or Discord channel
 
@@ -1392,6 +1381,16 @@ compared against `NETWORK_PASSPHRASE`:
 
 A network whose RPC did not answer is not treated as "absent", so an outage produces no finding.
 
+**Testnet contracts in a Mainnet file** (offline) — the same copy-paste mistake is caught without the
+network. Copying a staging file and updating only `NETWORK_PASSPHRASE` leaves the Soroban addresses
+behind, and a Testnet contract ID in a Mainnet file resolves to nothing on chain. When
+`NETWORK_PASSPHRASE` is exactly the Public passphrase, every `WEB_AUTH_CONTRACT_ID` and
+`[[CURRENCIES]].contract` is matched against a small denylist of known Testnet reference contracts
+(the Testnet native XLM SAC and the Circle Testnet USDC SAC), and a match emits
+`soroban/testnet-contract-on-mainnet` (error) naming the contract and the edit that fixes it. A file
+on Testnet — or on any custom network — is never flagged, so the check stays silent for the team that
+is legitimately deploying there.
+
 **Contract dependencies** (with `--check-contracts`) — a declared contract is rarely the whole
 system, and the edges it depends on are invisible in the file. Each contract's deployed WASM import
 table is read, and every import module name that decodes as a contract address becomes an edge, which
@@ -1696,6 +1695,23 @@ New contributors are genuinely welcome — see [CONTRIBUTING.md](./CONTRIBUTING.
 matter of appending one object to a list and one fixture to a test.
 
 ## Integrations
+
+### VS Code extension
+
+Official VS Code client for `stellar.toml` files with live SEP-1 diagnostics,
+quick-fix code actions, hover documentation, SEP-1 syntax highlighting, a
+`$(check)`/`$(error)` status bar item, and the `stellar-toml.lint`,
+`stellar-toml.format`, and `stellar-toml.readiness` commands. Activates for
+`stellar.toml` and `.well-known/` files and spawns `stellar-toml-lint --lsp`
+over stdio. Configured via `stellarToml.strict`, `stellarToml.domain`, and
+`stellarToml.rules`.
+
+```bash
+npm run build:vscode
+npm run package:vscode
+```
+
+See [editors/vscode/README.md](./editors/vscode/README.md) for details.
 
 ### JetBrains IDE Plugin
 
