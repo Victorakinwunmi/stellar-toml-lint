@@ -484,6 +484,16 @@ own description, the permitted values where SEP-1 enumerates them (`live`, `dead
 `private`), and a link to the section of SEP-1 that defines the field. Hovering whitespace, a
 comment, or a key SEP-1 does not define shows nothing at all.
 
+#### VS Code extension
+
+The official client lives in [`editors/vscode/`](./editors/vscode/) and is built on
+`vscode-languageclient/node`. It activates for any file named `stellar.toml` or any
+file inside `.well-known/`, launches `stellar-toml-lint --lsp` over stdio, and
+contributes the `stellar-toml.lint`, `stellar-toml.format`, and
+`stellar-toml.readiness` commands plus the `stellarToml.strict`,
+`stellarToml.domain`, and `stellarToml.rules` settings and a `$(check)`/`$(error)`
+status bar item. Package it with `npm run package:vscode` (wraps `vsce package`).
+
 ### Alerting a Slack or Discord channel
 
 ```console
@@ -1371,6 +1381,16 @@ compared against `NETWORK_PASSPHRASE`:
 
 A network whose RPC did not answer is not treated as "absent", so an outage produces no finding.
 
+**Testnet contracts in a Mainnet file** (offline) — the same copy-paste mistake is caught without the
+network. Copying a staging file and updating only `NETWORK_PASSPHRASE` leaves the Soroban addresses
+behind, and a Testnet contract ID in a Mainnet file resolves to nothing on chain. When
+`NETWORK_PASSPHRASE` is exactly the Public passphrase, every `WEB_AUTH_CONTRACT_ID` and
+`[[CURRENCIES]].contract` is matched against a small denylist of known Testnet reference contracts
+(the Testnet native XLM SAC and the Circle Testnet USDC SAC), and a match emits
+`soroban/testnet-contract-on-mainnet` (error) naming the contract and the edit that fixes it. A file
+on Testnet — or on any custom network — is never flagged, so the check stays silent for the team that
+is legitimately deploying there.
+
 **Contract dependencies** (with `--check-contracts`) — a declared contract is rarely the whole
 system, and the edges it depends on are invisible in the file. Each contract's deployed WASM import
 table is read, and every import module name that decodes as a contract address becomes an edge, which
@@ -1675,6 +1695,23 @@ New contributors are genuinely welcome — see [CONTRIBUTING.md](./CONTRIBUTING.
 matter of appending one object to a list and one fixture to a test.
 
 ## Integrations
+
+### VS Code extension
+
+Official VS Code client for `stellar.toml` files with live SEP-1 diagnostics,
+quick-fix code actions, hover documentation, SEP-1 syntax highlighting, a
+`$(check)`/`$(error)` status bar item, and the `stellar-toml.lint`,
+`stellar-toml.format`, and `stellar-toml.readiness` commands. Activates for
+`stellar.toml` and `.well-known/` files and spawns `stellar-toml-lint --lsp`
+over stdio. Configured via `stellarToml.strict`, `stellarToml.domain`, and
+`stellarToml.rules`.
+
+```bash
+npm run build:vscode
+npm run package:vscode
+```
+
+See [editors/vscode/README.md](./editors/vscode/README.md) for details.
 
 ### JetBrains IDE Plugin
 
