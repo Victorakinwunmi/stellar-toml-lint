@@ -609,7 +609,11 @@ async function main(argv: string[]): Promise<number> {
               );
             }
 
-            if (cli.verifySep30 && cli.checkNetwork && fileResult.parsed?.RECOVERY_SERVER !== undefined) {
+            if (
+              cli.verifySep30 &&
+              cli.checkNetwork &&
+              fileResult.parsed?.RECOVERY_SERVER !== undefined
+            ) {
               networkDiagnostics.push(
                 ...(await verifySep30(fileResult.parsed, fetchImpl, { rules })),
               );
