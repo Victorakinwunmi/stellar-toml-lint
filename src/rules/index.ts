@@ -26,6 +26,7 @@ import { sorobanErrorRules } from '../soroban/errors.js';
 import { multiNetworkRules } from '../soroban/multi-network.js';
 import { dependencyGraphRules } from '../soroban/dependency-graph.js';
 import { sep12Rules } from './sep12-schema.js';
+import { sep10Rules } from '../protocols/sep10.js';
 import { sep6Rules } from '../cross-sep/sep6.js';
 import { corsPreflightRules } from '../network/cors-preflight.js';
 import { overlayCrawlerRules } from '../overlay/crawler-rules.js';
@@ -49,6 +50,7 @@ import { sep6IntegrationRules } from '../protocols/sep6.js';
 import { sep31Rules } from '../protocols/sep31.js';
 import { sep8Rules } from '../protocols/sep8.js';
 import { sep38QuoteRules } from '../protocols/sep38.js';
+import { sep24Rules } from '../protocols/sep24.js';
 import { wasmAuditorRules } from '../soroban/wasm-auditor.js';
 import { envMetaRules } from '../soroban/env-meta.js';
 import { eventRules } from '../soroban/events.js';
@@ -64,6 +66,7 @@ export const allRules: Rule[] = [
   ...generalRules,
   insecureHttpRule,
   ...deprecationRules,
+  ...sep10Rules,
   ...documentationRules,
   ...principalRules,
   ...currencyRules,
@@ -100,6 +103,7 @@ export const allRules: Rule[] = [
   ...sep31Rules,
   ...sep8Rules,
   ...sep38QuoteRules,
+  ...sep24Rules,
   ...sep7Rules,
   ...corsPreflightRules,
   ...overlayCrawlerRules,
@@ -170,6 +174,7 @@ export {
   sep31Rules,
   sep8Rules,
   sep38QuoteRules,
+  sep24Rules,
   wasmAuditorRules,
   envMetaRules,
   eventRules,

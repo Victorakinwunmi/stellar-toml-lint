@@ -274,6 +274,7 @@ failure.
 | `--verify-sep8`             | Simulate SEP-8 regulated asset compliance approval server interaction (requires `--check-network`)                                                                                                          |
 | `--verify-sep30`            | Validate RECOVERY_SERVER /accounts endpoint and signer public keys (requires `--check-network`)                                                                                                             |
 | `--verify-sep38`            | Audit SEP-38 quote coverage, bid-ask spread, and quote expirations (requires `--check-network`)                                                                                                             |
+| `--verify-sep24`            | Audit SEP-24 hosted deposit/withdrawal flow: `/info` currency coverage, numeric fee schemas, and HTTPS interactive session URLs (requires `--check-network`)                                                  |
 | `--crawl-peers`             | Discover validator peers with overlay `GET_PEERS` messages (requires `--check-network`)                                                                                                                     |
 | `--verify-buckets`          | Download a sample of each archive's `currentBuckets`, verify the SHA-256 of the decompressed stream, and decode the XDR `BucketEntry` stream (requires `--check-network`)                                   |
 | `--verify-overlay`          | Complete the overlay TCP handshake with each `[[VALIDATORS]]` HOST and check its network, node ID, and protocol version (requires `--check-network`)                                                        |
@@ -1935,3 +1936,29 @@ Measures response latency of a SEP-8 approval server over 5 sample requests and 
 
 - `sep8/approval-server-unresponsive` - more than 2 of 5 requests fail
 - `sep8/approval-server-high-latency` - average latency exceeds 3000ms SLA
+
+### SEP-12 KYC verification (`--verify-sep12`)
+
+Runs the interactive SEP-12 customer verification suite against the anchor's
+`KYC_SERVER`. Requires `--check-network` (SEP-12 is a live protocol) and uses
+synthetic sandbox data only — the suite never sends real PII.
+
+    stellar-toml-lint public/.well-known/stellar.toml --check-network --verify-sep12
+
+Diagnostics emitted:
+
+| Rule | Severity | When it fires |
+|------|----------|---------------|
+| `sep12/invalid-customer-status` | error | `GET /customer` or `PUT /customer` returns a status other than `NEEDS_INFO`, `PROCESSING`, `ACCEPTED`, `REJECTED` |
+| `sep12/missing-required-kyc-fields` | warning | A `NEEDS_INFO` response omits one or more of `first_name`, `last_name`, `email_address` from its `fields` map |
+| `sep12/binary-upload-unsupported` | error | `PUT /customer/verification` rejects a well-formed multipart/form-data request carrying a binary identity document |
+
+The suite exercises three endpoints end to end:
+
+1. `GET /customer?type=<type>` for each declared customer type
+2. `PUT /customer` with synthetic registration data
+3. `PUT /customer/verification` with a multipart body containing a binary PNG
+
+Servers that return 403 (SEP-10 auth required) or 404 (unknown customer) are
+treated as silence rather than a finding, matching the SEP-38 suite's
+behaviour for auth-gated anchors.
