@@ -34,13 +34,7 @@ function makeChallenge(server: Keypair, options: ChallengeOptions = {}): string 
     networkPassphrase: PASSPHRASE,
     fee: '100',
     ...(options.timebounds ? { timebounds: options.timebounds } : {}),
-  });
-
-  if (!options.timebounds) {
-    builder.setTimeout(0);
-  }
-
-  builder.addOperation(
+  }).addOperation(
     Operation.manageData({
       name: options.opName ?? `${HOME} auth`,
       value: Buffer.from('nonce'),

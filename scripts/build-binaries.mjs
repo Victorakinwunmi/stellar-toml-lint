@@ -41,7 +41,7 @@ execFileSync(
   npx,
   [
     '--yes',
-    'esbuild@0.25.0',
+    'esbuild',
     resolve('dist', 'cli.js'),
     '--bundle',
     '--platform=node',
