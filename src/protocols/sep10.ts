@@ -16,7 +16,8 @@
  * are not findings - only spec violations are.
  */
 
-import { Keypair, StrKey, type Transaction, TransactionBuilder } from '@stellar/stellar-base';
+import { Keypair, StrKey, TransactionBuilder } from '@stellar/stellar-base';
+import type { Transaction } from '@stellar/stellar-base';
 import type { Diagnostic, Rule, RuleOverrides } from '../types.js';
 
 export const INVALID_SOURCE_RULE = 'sep10/invalid-source-account';
